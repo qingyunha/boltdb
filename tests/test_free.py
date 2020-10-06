@@ -2,7 +2,7 @@ import os
 import unittest
 import tempfile
 
-from pybolt import BoltDB
+from boltdb import BoltDB
 
 
 class TestFree(unittest.TestCase):

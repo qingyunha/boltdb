@@ -3,8 +3,8 @@ import unittest
 import tempfile
 import threading
 
-from pybolt import BoltDB
-from pybolt.rwlock import RWLock
+from boltdb import BoltDB
+from boltdb.rwlock import RWLock
 
 
 class BRWLock(RWLock):

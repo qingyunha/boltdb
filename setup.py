@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="boltdb",
-    version="0.0.1",
+    version="0.0.2",
     author="Tao Qingyun",
     author_email="taoqy@ls-a.me",
     description="python port of boltdb",
