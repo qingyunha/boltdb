@@ -67,6 +67,19 @@ class TestBucket(unittest.TestCase):
             with self.assertRaisesRegex(Exception, "cannot write sub bucket"):
                 b.put(b"foo", b"bar")
 
+    def test_iter(self):
+        orderd_tyes = b"abcdefghijklmnopqrstuvwxyz"
+        with self.db.update() as tx:
+            b = tx.create_bucket(b"widgets")
+            for i in range(len(orderd_tyes)):
+                b.put(orderd_tyes[i:], b"foo")
+
+        with self.db.view() as tx:
+            b = tx.bucket(b"widgets")
+            for i, (k, _) in enumerate(b):
+                self.assertEqual(k, orderd_tyes[i:])
+            self.assertEqual(i, len(orderd_tyes)-1)
+
     def test_delete(self):
         with self.db.update() as tx:
             b = tx.create_bucket(b"widgets")
