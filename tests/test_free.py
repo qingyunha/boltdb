@@ -16,10 +16,10 @@ class TestFree(unittest.TestCase):
     def test_free(self):
         with self.db.update() as tx:
             b = tx.bucket()
-            v = b.put(b"foo", b"bar")
+            b.put(b"foo", b"bar")
         self.assertEqual(self.db.freelist.ids, [3])
 
         with self.db.update() as tx:
             b = tx.bucket()
-            v = b.put(b"foo", b"bar")
+            b.put(b"foo", b"bar")
         self.assertEqual(self.db.freelist.ids, [4])

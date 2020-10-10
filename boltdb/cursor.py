@@ -70,7 +70,7 @@ class Cursor:
         ref = self.stack[-1]
         if ref.index >= ref.count():
             k, v, flags = self._next()
-            
+
         if k is None:
             return None, None
         if flags & 0x1:
@@ -114,7 +114,7 @@ class Cursor:
                     ref.index += 1
                     break
                 i -= 1
-            
+
             if i == -1:
                 return None, None, 0
 
@@ -141,7 +141,7 @@ class Cursor:
                 inodes = n.inodes
             else:
                 inodes = ref.page.leaf_elems()
-            ref.index = bisect_left(inodes, key) 
+            ref.index = bisect_left(inodes, key)
         else:
             if n is not None:
                 inodes = n.inodes

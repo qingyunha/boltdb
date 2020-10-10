@@ -53,5 +53,5 @@ class TestRW(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "blocked"):
             self.db.begin(True)
         wtx.close()
-        with self.db.update() as tx:
+        with self.db.update():
             pass

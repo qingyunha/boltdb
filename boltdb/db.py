@@ -4,13 +4,12 @@ import mmap
 import threading
 import contextlib
 
-from .bucket import Bucket
 from .freelist import FreeList
 from .page import page_from_data
 from .tx import Tx
 from .rwlock import RWLock
 from .share import leafPageFlag, metaPageFlag, freelistPageFlag, \
-                    page_struct, meta_tuple, meta_struct
+    page_struct, meta_tuple, meta_struct
 
 
 PAGESIZE = 4096
@@ -21,7 +20,7 @@ class BoltDB:
     def __init__(self, filename, readonly=False):
         self.filename = filename
         self.readonly = readonly
-        self.fd = os.open(filename, os.O_RDWR|os.O_CREAT, 0o666)
+        self.fd = os.open(filename, os.O_RDWR | os.O_CREAT, 0o666)
         if readonly:
             fcntl.lockf(self.fd, fcntl.LOCK_SH)
         else:
@@ -52,8 +51,10 @@ class BoltDB:
             p.id = i
             p.flags = metaPageFlag
             p.write_header()
-            m = meta_struct.pack_into(buf, i*PAGESIZE+page_struct.size,
-                0xED0CDAED, 2, PAGESIZE, 0, 3, 0, 2, 4, i, 0)
+            meta_struct.pack_into(
+                buf, i*PAGESIZE+page_struct.size,
+                0xED0CDAED, 2, PAGESIZE, 0, 3, 0, 2, 4, i, 0
+            )
 
         i = 2
         p = page_from_data(buf[i*PAGESIZE:])
@@ -98,12 +99,12 @@ class BoltDB:
         try:
             yield tx
             tx.commit()
-        except:
+        except: # noqa
             self.freelist.rollback()
             raise
         finally:
             tx.close()
-    
+
     @contextlib.contextmanager
     def view(self):
         tx = self.begin()
@@ -127,7 +128,7 @@ class BoltDB:
                 self.mmap_lock.w_release()
             pgid = self.max_pgid
             self.max_pgid += n
-            for i in range(n): 
+            for i in range(n):
                 self.freelist.allocate_new(pgid+i)
 
         p = self.page(pgid)

@@ -1,1 +1,1 @@
-from .db import BoltDB
+from .db import BoltDB # noqa

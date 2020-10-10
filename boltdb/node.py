@@ -23,7 +23,7 @@ class Node:
 
     def __init__(self, bucket):
         self.bucket = bucket
-        self.is_leaf = False 
+        self.is_leaf = False
         self.unbalanced = False
         self.spilled = False
         self.key = None
@@ -40,7 +40,7 @@ class Node:
     def size(self):
         sz = page_struct.size
         elsz = leaf_elem_struct.size \
-                if self.is_leaf else branch_elem_struct.size
+            if self.is_leaf else branch_elem_struct.size
         for n in self.inodes:
             sz += elsz + len(n.key) + len(n.value)
         return sz
@@ -51,7 +51,7 @@ class Node:
         return self.bucket.node(self.inodes[index].pgid, self)
 
     def child_index(self, n):
-         return bisect_left(self.inodes, n.key)
+        return bisect_left(self.inodes, n.key)
 
     def num_children(self):
         return len(self.inodes)
@@ -75,7 +75,7 @@ class Node:
     def put(self, old_key, new_key, value, pgid, flags):
         index = bisect_left(self.inodes, old_key)
         exact = self.inodes and index < len(self.inodes) and \
-                self.inodes[index].key == old_key
+            self.inodes[index].key == old_key
         n = Inode(new_key, value, pgid, flags)
         if exact:
             self.inodes[index] = n
@@ -129,7 +129,8 @@ class Node:
             #     n.pgid = p.id
             # else:
             #     p = None
-            if n.pgid > 0: tx.db.freelist.free(tx.page(n.pgid))
+            if n.pgid > 0:
+                tx.db.freelist.free(tx.page(n.pgid))
             p = self.bucket.tx.allocate((n.size()+tx.db.pagesize-1)//tx.db.pagesize)
             n.pgid = p.id
             n.write(p)
@@ -178,7 +179,7 @@ class Node:
     def _split_index(self, threshold):
         sz = page_struct.size
         elsz = leaf_elem_struct.size \
-                if self.is_leaf else branch_elem_struct.size
+            if self.is_leaf else branch_elem_struct.size
         for i, n in enumerate(self.inodes):
             sz += elsz + len(n.key) + len(n.value)
             if i >= 2 and sz > threshold:

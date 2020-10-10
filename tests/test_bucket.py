@@ -28,7 +28,7 @@ class TestBucket(unittest.TestCase):
 
     def test_get_bucket_is_none(self):
         with self.db.update() as tx:
-            b = tx.create_bucket(b"widgets")
+            tx.create_bucket(b"widgets")
             tx.bucket(b"widgets").create_bucket(b"foo")
             self.assertIsNone(tx.bucket(b"widgets").get(b"foo"))
 

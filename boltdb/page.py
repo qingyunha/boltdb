@@ -1,8 +1,8 @@
 from .node import Inode
 from .share import leafPageFlag, freelistPageFlag, \
-                    page_tuple, page_struct, \
-                    leaf_elem_tuple, leaf_elem_struct, \
-                    branch_elem_tuple, branch_elem_struct
+    page_tuple, page_struct, \
+    leaf_elem_tuple, leaf_elem_struct, \
+    branch_elem_tuple, branch_elem_struct
 
 
 class Page:
@@ -51,7 +51,7 @@ class Page:
 
     def write_inodes(self, inodes):
         self.count = len(inodes)
-        self.inodes = inodes 
+        self.inodes = inodes
         if self.is_leaf():
             elem_size = leaf_elem_struct.size
         else:
@@ -68,7 +68,7 @@ class Page:
                 self.data[off:off+len(n.key)] = n.key
                 try:
                     self.data[off+len(n.key):off+len(n.key)+len(n.value)] = n.value
-                except:
+                except: # noqa
                     print(type(n.value), len(n.value))
                     raise
             else:
@@ -98,6 +98,7 @@ class Page:
         for i in ids:
             self.data[i*8:(i+1)*8] = i.to_bytes(8, "little")
         self.write_header()
+
 
 def page_from_data(data):
     page = Page()

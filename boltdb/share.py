@@ -2,9 +2,9 @@ import struct
 from collections import namedtuple
 
 
-branchPageFlag   = 0x01
-leafPageFlag     = 0x02
-metaPageFlag     = 0x04
+branchPageFlag = 0x01
+leafPageFlag = 0x02
+metaPageFlag = 0x04
 freelistPageFlag = 0x10
 
 bucketLeafFlag = 0x01
@@ -24,5 +24,3 @@ branch_elem_struct = struct.Struct("IIQ")
 
 bucket_tuple = namedtuple("bucket", "root dequence")
 bucket_struct = struct.Struct("QQ")
-
-

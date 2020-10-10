@@ -105,7 +105,7 @@ class Bucket:
         c.node().delete(name)
 
         # TODO free pages
-        
+
     def page_node(self, pgid):
         if self.root_pgid == 0:
             if self.root_node is not None:
