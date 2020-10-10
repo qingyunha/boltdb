@@ -118,11 +118,11 @@ class Node:
         for c in self.children:
             c.spill()
 
-        self.children = []
-        nodes = self.split()
         # print("spill page id", self.pgid, id(self), id(self.parent), self.size())
         # print("spill nodes ", len(nodes))
         tx = self.bucket.tx
+        self.children = []
+        nodes = self.split(tx.db.pagesize)
         for n in nodes:
             # if n.pgid == 0:
             #     p = self.bucket.tx.allocate((n.size()+4096-1)//4096)
@@ -130,7 +130,7 @@ class Node:
             # else:
             #     p = None
             if n.pgid > 0: tx.db.freelist.free(tx.page(n.pgid))
-            p = self.bucket.tx.allocate((n.size()+4096-1)//4096)
+            p = self.bucket.tx.allocate((n.size()+tx.db.pagesize-1)//tx.db.pagesize)
             n.pgid = p.id
             n.write(p)
             n.spilled = True
@@ -144,22 +144,22 @@ class Node:
             self.children = []
             self.parent.spill()
 
-    def split(self, page_size=4000):
+    def split(self, pagesize):
         nodes = []
         node = self
         while node is not None:
-            a, b = node.split_two(page_size)
+            a, b = node.split_two(pagesize)
             nodes.append(a)
             node = b
         return nodes
 
-    def split_two(self, page_size):
+    def split_two(self, pagesize):
         # print("split me", id(self), self.size())
-        if len(self.inodes) <= 2 or self.size() < page_size:
+        if len(self.inodes) <= 2 or self.size() < pagesize:
             return self, None
 
         # i = len(self.inodes) // 2
-        i = self._split_index(page_size*3/4)
+        i = self._split_index(pagesize*3/4)
         if self.parent is None:
             p = Node(self.bucket)
             p.children = [self]
@@ -191,7 +191,7 @@ class Node:
 
         # print("rebalance", self.pgid, len(self.inodes))
 
-        threshold = 4096/4
+        threshold = self.bucket.tx.db.pagesize/4
         if self.size() > threshold and len(self.inodes) > 2:
             return
 
