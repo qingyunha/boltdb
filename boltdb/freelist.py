@@ -70,6 +70,12 @@ class FreeList:
         for id in self.ids:
             self.cache.add(id)
 
+    def read_ids(self, ids):
+        self.ids = ids
+        self.cache = set()
+        for id in self.ids:
+            self.cache.add(id)
+
     def write(self, p):
         self.ids = sorted(self.ids+self.pending)
         self.allocs.clear()

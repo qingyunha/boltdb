@@ -14,6 +14,8 @@ from .share import leafPageFlag, metaPageFlag, freelistPageFlag, \
 
 PAGESIZE = 4096
 
+NO_FREELIST = 0xffffffffffffffff
+
 
 class BoltDB:
 
@@ -34,15 +36,19 @@ class BoltDB:
         self.pagesize = self.meta0.pageSize
         self.max_pgid = self.datasz // self.pagesize
 
+        self.lock = threading.Lock()
+        self.meta_lock = threading.Lock()
+        self.mmap_lock = RWLock()
+
         if readonly:
             self.freelist = None
         else:
             self.freelist = FreeList()
-            self.freelist.read(self.page(self.meta().freelist))
-
-        self.lock = threading.Lock()
-        self.meta_lock = threading.Lock()
-        self.mmap_lock = RWLock()
+            meta = self.meta()
+            if meta.freelist == NO_FREELIST:
+                self.freelist.read_ids(self.freepages())
+            else:
+                self.freelist.read(self.page(meta.freelist))
 
     def _init_db_file(self):
         buf = memoryview(bytearray(PAGESIZE*4))
@@ -135,6 +141,16 @@ class BoltDB:
         p.id = pgid
         p.overflow = n - 1
         return p
+
+    def freepages(self):
+        ids = []
+        with self.view() as tx:
+            reachable = {}
+            tx.check_bucket(tx.root, reachable)
+            for i in range(2, tx.meta.max_pgid):
+                if i not in reachable:
+                    ids.append(i)
+        return ids
 
     def close(self):
         self.lock.acquire()

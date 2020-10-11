@@ -1,5 +1,5 @@
 from .node import Inode
-from .share import leafPageFlag, freelistPageFlag, \
+from .share import leafPageFlag, branchPageFlag, freelistPageFlag, \
     page_tuple, page_struct, \
     leaf_elem_tuple, leaf_elem_struct, \
     branch_elem_tuple, branch_elem_struct
@@ -19,6 +19,9 @@ class Page:
 
     def is_leaf(self):
         return bool(self.flags & leafPageFlag)
+
+    def is_branch(self):
+        return bool(self.flags & branchPageFlag)
 
     def leaf_elems(self):
         if self.inodes is not None:

@@ -90,6 +90,32 @@ class Tx:
         p.data[:len(new_meta)] = new_meta
         self.db.mmap.obj.flush()
 
+    def for_each_page(self, pgid):
+        p = self.page(pgid)
+        yield p
+        if p.is_branch():
+            for elem in p.branch_elems():
+                self.for_each_page(elem.pgid)
+
+    def check_bucket(self, bucket, reachable):
+        if bucket.root_pgid == 0:
+            return
+
+        for p in bucket.tx.for_each_page(bucket.root_pgid):
+            if p.id > self.meta.max_pgid:
+                raise Exception("page out of bounds")
+            for i in range(p.overflow+1):
+                id = p.id + i
+                if id in reachable:
+                    raise Exception("multiple references")
+                reachable[id] = True
+
+        for k, v in bucket:
+            if v is not None:
+                continue
+            child = bucket.bucket(k)
+            self.check_bucket(child, reachable)
+
     def close(self):
         if self.closed:
             return
