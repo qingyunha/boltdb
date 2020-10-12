@@ -7,6 +7,7 @@ class Tx:
     def __init__(self, db, writable):
         self.db = db
         self.meta = db.meta()
+        self.freelist_pgid = self.meta.freelist
         self.root = Bucket(self, self.meta.root_pgid)
 
         self.writable = writable
@@ -66,7 +67,12 @@ class Tx:
 
     def commit_freelist(self):
         p = self.page(self.meta.freelist)
+        self.db.freelist.free(p)
+
+        p = self.db.allocate(self.db.freelist.size()//self.db.pagesize+1)
         self.db.freelist.write(p)
+
+        self.freelist_pgid = p.id
 
     def write(self):
         # for p in self.pages.values(): p.write_inodes()
@@ -82,7 +88,7 @@ class Tx:
             self.meta.flags,
             self.root.root_pgid,
             0,
-            self.meta.freelist,
+            self.freelist_pgid,
             self.db.max_pgid,
             self.txid,
             0,

@@ -22,7 +22,7 @@ class FreeList:
         return len(self.ids)
 
     def pending_count(self):
-        return len(self.pending_count)
+        return len(self.pending)
 
     def allocate(self, n):
         if len(self.ids) == 0:
