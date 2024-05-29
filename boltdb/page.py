@@ -98,8 +98,8 @@ class Page:
     def write_ids(self, ids):
         self.flags = freelistPageFlag
         self.count = len(ids)
-        for i in ids:
-            self.data[i*8:(i+1)*8] = i.to_bytes(8, "little")
+        for i, id in enumerate(ids):
+            self.data[i*8:(i+1)*8] = id.to_bytes(8, "little")
         self.write_header()
 
 
